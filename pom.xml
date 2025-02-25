@@ -52,24 +52,14 @@
             <artifactId>guava</artifactId>
             <version>19.0-rc2</version>
         </dependency>
-
-        <!-- Dependencies from jitpack.io -->
-        <dependency>
-            <groupId>com.github.ata4</groupId>
-            <artifactId>lzmajio</artifactId>
-            <version>e6877e7e01</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ata4</groupId>
-            <artifactId>ioutils</artifactId>
-            <version>047e401d73</version>
-        </dependency>
     </dependencies>
     
     <modules>
         <module>disunity-core</module>
         <module>disunity-cli</module>
         <module>disunity-dist</module>
+        <module>ioutils</module>
+        <module>lzmajio</module>
     </modules>
 
 </project>

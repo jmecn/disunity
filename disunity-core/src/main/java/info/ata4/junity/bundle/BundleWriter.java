@@ -56,7 +56,7 @@ public class BundleWriter implements Closeable {
                 if (bundle.entries().size() == 1) {
                     return true;
                 }
-                String name = entry.name();
+                String name = entry.getName();
                 return name.equals("mainData") || name.startsWith("level");
             })
             .forEach(entry -> levelOffsetMap.put(entry, new MutablePair<>(0L, 0L)));
@@ -113,11 +113,11 @@ public class BundleWriter implements Closeable {
         long baseOffset = out.position();
         out.writeInt(entries.size());
 
-        List<BundleEntryInfo> entryInfos = new ArrayList<>(entries.size());
+        List<StreamingInfo> entryInfos = new ArrayList<>(entries.size());
         for (BundleEntry entry : entries) {
-            BundleEntryInfo entryInfo = new BundleEntryInfo();
-            entryInfo.name(entry.name());
-            entryInfo.size(entry.size());
+            StreamingInfo entryInfo = new StreamingInfo();
+            entryInfo.setName(entry.getName());
+            entryInfo.setSize(entry.getSize());
             out.writeStruct(entryInfo);
             entryInfos.add(entryInfo);
         }
@@ -127,14 +127,14 @@ public class BundleWriter implements Closeable {
             out.align(4);
 
             BundleEntry entry = entries.get(i);
-            BundleEntryInfo entryInfo = entryInfos.get(i);
+            StreamingInfo entryInfo = entryInfos.get(i);
 
-            progress.update(Optional.of(entry.name()), i / (double) entries.size());
+            progress.update(Optional.of(entry.getName()), i / (double) entries.size());
 
-            entryInfo.offset(out.position() - baseOffset);
+            entryInfo.setOffset(out.position() - baseOffset);
 
             if (i == 0) {
-                bundle.header().dataHeaderSize(entryInfo.offset());
+                bundle.header().dataHeaderSize(entryInfo.getOffset());
             }
 
             try (
@@ -154,7 +154,7 @@ public class BundleWriter implements Closeable {
 
         // update offsets
         out.position(baseOffset + 4);
-        for (BundleEntryInfo entryInfo : entryInfos) {
+        for (StreamingInfo entryInfo : entryInfos) {
             out.writeStruct(entryInfo);
         }
     }

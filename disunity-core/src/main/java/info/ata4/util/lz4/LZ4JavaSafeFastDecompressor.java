@@ -6,9 +6,6 @@ import static info.ata4.util.lz4.LZ4Constants.*;
 
 import java.nio.ByteBuffer;
 
-import info.ata4.util.lz4.ByteBufferUtils;
-import info.ata4.util.lz4.SafeUtils;
-
 /**
  * Decompressor.
  */
@@ -43,7 +40,7 @@ public final class LZ4JavaSafeFastDecompressor extends LZ4FastDecompressor {
       // literals
       int literalLen = token >>> ML_BITS;
       if (literalLen == RUN_MASK) {
-        byte len = (byte) 0xFF;
+        byte len;
         while ((len = SafeUtils.readByte(src, sOff++)) == (byte) 0xFF) {
           literalLen += 0xFF;
         }
@@ -79,7 +76,7 @@ public final class LZ4JavaSafeFastDecompressor extends LZ4FastDecompressor {
 
       int matchLen = token & ML_MASK;
       if (matchLen == ML_MASK) {
-        byte len = (byte) 0xFF;
+        byte len;
         while ((len = SafeUtils.readByte(src, sOff++)) == (byte) 0xFF) {
           matchLen += 0xFF;
         }
@@ -138,7 +135,7 @@ public final class LZ4JavaSafeFastDecompressor extends LZ4FastDecompressor {
       // literals
       int literalLen = token >>> ML_BITS;
       if (literalLen == RUN_MASK) {
-        byte len = (byte) 0xFF;
+        byte len;
         while ((len = ByteBufferUtils.readByte(src, sOff++)) == (byte) 0xFF) {
           literalLen += 0xFF;
         }
@@ -174,7 +171,7 @@ public final class LZ4JavaSafeFastDecompressor extends LZ4FastDecompressor {
 
       int matchLen = token & ML_MASK;
       if (matchLen == ML_MASK) {
-        byte len = (byte) 0xFF;
+        byte len;
         while ((len = ByteBufferUtils.readByte(src, sOff++)) == (byte) 0xFF) {
           matchLen += 0xFF;
         }

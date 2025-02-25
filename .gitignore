@@ -1,5 +1,7 @@
 # Created by https://www.gitignore.io
 
+.idea
+.DS_store
 ### NetBeans ###
 nbproject/
 build/

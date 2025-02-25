@@ -11,39 +11,36 @@ package info.ata4.junity.bundle;
 
 import info.ata4.io.DataReader;
 import info.ata4.io.DataWriter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.IOException;
 
 /**
  * UnityFS-format bundle entry info
  */
-public class BundleEntryInfoFS extends BundleEntryInfo {
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class StreamingInfoFS extends StreamingInfo {
 
     // unknown extra field, guessing flags
     private long flags;
 
-    public long flags() { return flags; };
-
-    public void flags(long flags) { this.flags = flags; }
-
     @Override
     public void read(DataReader in) throws IOException {
-        offset(in.readLong());
-        size(in.readLong());
-        flags = in.readUnsignedInt();
-        name(in.readStringNull());
+        setOffset(in.readLong());
+        setSize(in.readLong());
+        setFlags(in.readUnsignedInt());
+        setName(in.readStringNull());
     }
 
     @Override
     public void write(DataWriter out) throws IOException {
-        out.writeLong(offset());
-        out.writeLong(size());
-        out.writeUnsignedInt(flags);
-        out.writeStringNull(name());
-    }
-
-    @Override
-    public String toString() {
-        return name();
+        out.writeLong(getOffset());
+        out.writeLong(getSize());
+        out.writeUnsignedInt(getFlags());
+        out.writeStringNull(getName());
     }
 }

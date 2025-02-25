@@ -16,6 +16,8 @@ import info.ata4.junity.UnityVersion;
 import info.ata4.junity.bundle.Bundle;
 import info.ata4.junity.bundle.BundleExternalEntry;
 import info.ata4.junity.bundle.BundleHeader;
+import info.ata4.junity.bundle.StreamingInfo;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -51,7 +53,7 @@ class BundleProps {
         props.unityRevision = header.unityRevision().toString();
 
         props.files = bundle.entryInfos().stream()
-            .map(entry -> entry.name())
+            .map(StreamingInfo::getName)
             .collect(Collectors.toList());
 
         try (Writer writer = Files.newBufferedWriter(propsFile,

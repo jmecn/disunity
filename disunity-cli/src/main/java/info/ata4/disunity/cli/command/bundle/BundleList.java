@@ -58,9 +58,7 @@ public class BundleList extends BundleCommand {
         TableBuilder table = new TableBuilder();
         table.row("Name", "Size", "Offset");
 
-        bundle.entryInfos().forEach(entry -> {
-            table.row(entry.name(), entry.size(), entry.offset());
-        });
+        bundle.entryInfos().forEach(entry -> table.row(entry.getName(), entry.getSize(), entry.getOffset()));
 
         return table.get();
     }

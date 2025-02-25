@@ -27,12 +27,12 @@ public class BundleExternalEntry extends BundleEntry {
     }
 
     @Override
-    public String name() {
+    public String getName() {
         return file.getFileName().toString();
     }
 
     @Override
-    public long size() {
+    public long getSize() {
         try {
             return Files.size(file);
         } catch (IOException ex) {

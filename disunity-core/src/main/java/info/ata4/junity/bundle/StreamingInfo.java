@@ -12,42 +12,20 @@ package info.ata4.junity.bundle;
 import info.ata4.io.DataReader;
 import info.ata4.io.DataWriter;
 import info.ata4.io.Struct;
+import lombok.Data;
+
 import java.io.IOException;
 
 /**
  *
  * @author Nico Bergemann <barracuda415 at yahoo.de>
- * @unity StreamingInfo
  */
-public class BundleEntryInfo implements Struct {
+@Data
+public class StreamingInfo implements Struct {
 
     private String name;
     private long offset;
     private long size;
-
-    public String name() {
-        return name;
-    }
-
-    public void name(String name) {
-        this.name = name;
-    }
-
-    public long offset() {
-        return offset;
-    }
-
-    public void offset(long offset) {
-        this.offset = offset;
-    }
-
-    public long size() {
-        return size;
-    }
-
-    public void size(long size) {
-        this.size = size;
-    }
 
     @Override
     public void read(DataReader in) throws IOException {
@@ -65,6 +43,6 @@ public class BundleEntryInfo implements Struct {
 
     @Override
     public String toString() {
-        return name();
+        return getName();
     }
 }

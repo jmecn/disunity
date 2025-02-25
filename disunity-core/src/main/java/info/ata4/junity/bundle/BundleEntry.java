@@ -20,18 +20,18 @@ import org.apache.commons.io.FilenameUtils;
 public abstract class BundleEntry {
 
     public static boolean isLibrary(BundleEntry entry) {
-        String ext = FilenameUtils.getExtension(entry.name());
+        String ext = FilenameUtils.getExtension(entry.getName());
         return ext.equals("dll") || ext.equals("mdb");
     }
 
     public static boolean isResource(BundleEntry entry) {
-        String ext = FilenameUtils.getExtension(entry.name());
+        String ext = FilenameUtils.getExtension(entry.getName());
         return ext.equals("resource");
     }
 
-    public abstract String name();
+    public abstract String getName();
 
-    public abstract long size();
+    public abstract long getSize();
 
     public abstract InputStream inputStream() throws IOException;
 }

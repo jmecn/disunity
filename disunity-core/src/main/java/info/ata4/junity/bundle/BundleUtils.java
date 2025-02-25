@@ -56,7 +56,7 @@ public class BundleUtils {
         SeekableByteChannel chan;
 
         // check if the entry is larger than 128 MiB
-        long size = entry.size();
+        long size = entry.getSize();
         if (size > 1 << 27) {
             // copy entry to temporary file
             Path tmpFile = Files.createTempFile("disunity", null);

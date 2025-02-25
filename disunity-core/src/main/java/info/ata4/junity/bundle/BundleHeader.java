@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import lombok.Data;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -26,6 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
  * @author Nico Bergemann <barracuda415 at yahoo.de>
  * @unity UnityWebStreamHeader
  */
+@Data
 public class BundleHeader implements Struct {
 
     public static final String SIGNATURE_WEB = "UnityWeb";
@@ -129,6 +132,11 @@ public class BundleHeader implements Struct {
             }
 
             in.readByte();
+        }
+
+        if (streamVersion >= 7) {
+            // align to 16
+            in.align(16);
         }
     }
 
@@ -254,8 +262,6 @@ public class BundleHeader implements Struct {
     }
 
     public int compressedDataHeaderSize() { return compressedDataHeaderSize; }
-
-    public int dataHeaderCompressionScheme() { return (flags & 0x3f); }
 
     public boolean dataHeaderAtEndOfFile() { return (flags & 0x80) != 0; }
 

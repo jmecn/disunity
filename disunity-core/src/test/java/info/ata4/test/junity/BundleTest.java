@@ -107,7 +107,7 @@ public class BundleTest {
         bundle.entries().forEach(uncheck(entry -> {
             CountingOutputStream cos = new CountingOutputStream(new NullOutputStream());
             IOUtils.copy(entry.inputStream(), cos);
-            assertEquals("Entry size must match size of InputStream", entry.size(), cos.getCount());
+            assertEquals("Entry size must match size of InputStream", entry.getSize(), cos.getCount());
         }));
     }
 }

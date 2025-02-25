@@ -16,10 +16,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+
+import static info.ata4.junity.Const.*;
 import static java.nio.file.StandardOpenOption.READ;
+
+import java.util.Comparator;
 import java.util.List;
 
-import info.ata4.util.lz4.LZ4FastDecompressor;
 import info.ata4.util.lz4.LZ4JavaSafeFastDecompressor;
 import net.contrapunctus.lzma.LzmaInputStream;
 import org.apache.commons.io.input.BoundedInputStream;
@@ -41,7 +44,7 @@ public class BundleReader implements Closeable {
         in = DataReaders.forFile(file, READ);
     }
 
-    public Bundle read() throws BundleException, IOException {
+    public Bundle read() throws IOException {
         bundle = new Bundle();
 
         in.position(0);
@@ -54,7 +57,7 @@ public class BundleReader implements Closeable {
             throw new BundleException("Invalid signature");
         }
 
-        List<BundleEntryInfo> entryInfos = bundle.entryInfos();
+        List<StreamingInfo> entryInfos = bundle.entryInfos();
         if (header.compressedDataHeaderSize() > 0) {
             // UnityFS stream type 6 header
 
@@ -65,24 +68,27 @@ public class BundleReader implements Closeable {
             // build an input stream for the uncompressed data header
             InputStream headerIn = new BoundedInputStream(in.stream(), header.compressedDataHeaderSize());
             DataReader inData;
-            switch(header.dataHeaderCompressionScheme()) {
-                default:
-                case 0:
+            int compressionType = header.getFlags() & COMPRESSION_TYPE_MASK;
+            switch(compressionType) {
+                case COMPRESSION_TYPE_NONE:
                     // Not compressed
                     inData = DataReaders.forInputStream(headerIn);
-
-                case 1:
-                    // LZMA
-                    inData = DataReaders.forInputStream(
-                            new CountingInputStream(new LzmaInputStream(headerIn)));
-
-                case 3:
+                    break;
+                case COMPRESSION_TYPE_LZMA:
+                    // lzma
+                    inData = DataReaders.forInputStream(new CountingInputStream(new LzmaInputStream(headerIn)));
+                    break;
+                case COMPRESSION_TYPE_LZ4:// LZ4
+                case COMPRESSION_TYPE_LZ4HC:// lz4hc
                     // LZ4
                     byte[] compressed = new byte[header.compressedDataHeaderSize()];
                     byte[] decompressed = new byte[(int)header.dataHeaderSize()];
                     headerIn.read(compressed);
                     LZ4JavaSafeFastDecompressor.INSTANCE.decompress(compressed, decompressed);
                     inData = DataReaders.forByteBuffer(ByteBuffer.wrap(decompressed));
+                    break;
+                default:
+                    throw new BundleException("Unsupported data header compression scheme: " + compressionType);
             }
 
             // Block info: not captured for now
@@ -102,7 +108,7 @@ public class BundleReader implements Closeable {
             int files = inData.readInt();
 
             for (int i = 0; i < files; i++) {
-                BundleEntryInfo entryInfo = new BundleEntryInfoFS();
+                StreamingInfo entryInfo = new StreamingInfoFS();
                 inData.readStruct(entryInfo);
                 entryInfos.add(entryInfo);
             }
@@ -120,7 +126,7 @@ public class BundleReader implements Closeable {
             int files = inData.readInt();
 
             for (int i = 0; i < files; i++) {
-                BundleEntryInfo entryInfo = new BundleEntryInfo();
+                StreamingInfo entryInfo = new StreamingInfo();
                 inData.readStruct(entryInfo);
                 entryInfos.add(entryInfo);
             }
@@ -128,12 +134,10 @@ public class BundleReader implements Closeable {
 
         // sort entries by offset so that they're in the order in which they
         // appear in the file, which is convenient for compressed bundles
-        entryInfos.sort((a, b) -> Long.compare(a.offset(), b.offset()));
+        entryInfos.sort(Comparator.comparingLong(StreamingInfo::getOffset));
 
         List<BundleEntry> entries = bundle.entries();
-        entryInfos.forEach(entryInfo -> {
-            entries.add(new BundleInternalEntry(entryInfo, this::inputStreamForEntry));
-        });
+        entryInfos.forEach(entryInfo -> entries.add(new BundleInternalEntry(entryInfo, this::inputStreamForEntry)));
 
         return bundle;
     }
@@ -174,11 +178,11 @@ public class BundleReader implements Closeable {
         return new CountingInputStream(new LzmaInputStream(in.stream()));
     }
 
-    private InputStream inputStreamForEntry(BundleEntryInfo info) throws IOException {
+    private InputStream inputStreamForEntry(StreamingInfo info) throws IOException {
         if (closed) {
             throw new BundleException("Bundle reader is closed");
         }
-        return dataInputStream(info.offset(), info.size());
+        return dataInputStream(info.getOffset(), info.getSize());
     }
 
     @Override

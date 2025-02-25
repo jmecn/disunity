@@ -9,6 +9,8 @@
  */
 package info.ata4.junity.bundle;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +18,12 @@ import java.util.List;
  *
  * @author Nico Bergemann <barracuda415 at yahoo.de>
  */
+@Data
 public class Bundle {
 
     private final BundleHeader header = new BundleHeader();
     private final List<BundleEntry> entries = new ArrayList<>();
-    private final List<BundleEntryInfo> entryInfos = new ArrayList<>();
+    private final List<StreamingInfo> entryInfos = new ArrayList<>();
 
     public BundleHeader header() {
         return header;
@@ -30,7 +33,7 @@ public class Bundle {
         return entries;
     }
 
-    public List<BundleEntryInfo> entryInfos() {
+    public List<StreamingInfo> entryInfos() {
         return entryInfos;
     }
 }

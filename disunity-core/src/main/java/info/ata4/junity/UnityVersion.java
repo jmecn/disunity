@@ -18,18 +18,26 @@ import java.util.Objects;
  */
 public class UnityVersion implements Comparable<UnityVersion> {
 
-    private byte major;
-    private byte minor;
-    private byte patch;
+    private int major;
+    private int minor;
+    private int patch;
     private String build;
     private String raw;
 
     public UnityVersion(String version) {
         try {
-            major = partFromString(version.substring(0, 1));
-            minor = partFromString(version.substring(2, 3));
-            patch = partFromString(version.substring(4, 5));
-            build = version.substring(5);
+            String[] array = version.split("\\.");
+
+            major = partFromString(array[0]);
+            minor = partFromString(array[1]);
+            if (array[2].length() == 1) {
+                patch = partFromString(array[2]);
+                build = array[2];
+            } else {
+                String[] patches = array[2].split("f|a|b|rc");
+                patch = partFromString(patches[0]);
+                build = patches[1];
+            }
         } catch (NumberFormatException | IndexOutOfBoundsException ex) {
             // invalid format, save raw string
             raw = version;
@@ -40,15 +48,15 @@ public class UnityVersion implements Comparable<UnityVersion> {
         this("1.0.0f1");
     }
 
-    private byte partFromString(String part) {
+    private int partFromString(String part) {
         if (part.equals("x")) {
             return -1;
         } else {
-            return Byte.valueOf(part);
+            return Integer.valueOf(part);
         }
     }
 
-    private String partToString(byte part) {
+    private String partToString(int part) {
         if (part == -1) {
             return "x";
         } else {
@@ -60,27 +68,27 @@ public class UnityVersion implements Comparable<UnityVersion> {
         return raw == null;
     }
 
-    public byte major() {
+    public int major() {
         return major;
     }
 
-    public void major(byte major) {
+    public void major(int major) {
         this.major = major;
     }
 
-    public byte minor() {
+    public int minor() {
         return minor;
     }
 
-    public void minor(byte minor) {
+    public void minor(int minor) {
         this.minor = minor;
     }
 
-    public byte patch() {
+    public int patch() {
         return patch;
     }
 
-    public void patch(byte patch) {
+    public void patch(int patch) {
         this.patch = patch;
     }
 

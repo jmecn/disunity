@@ -19,23 +19,23 @@ import java.io.InputStream;
  */
 public class BundleInternalEntry extends BundleEntry {
 
-    private final BundleEntryInfo info;
-    private final IOFunction<BundleEntryInfo, InputStream> inputStreamFactory;
+    private final StreamingInfo info;
+    private final IOFunction<StreamingInfo, InputStream> inputStreamFactory;
 
-    public BundleInternalEntry(BundleEntryInfo info,
-            IOFunction<BundleEntryInfo, InputStream> isFactory) {
+    public BundleInternalEntry(StreamingInfo info,
+                               IOFunction<StreamingInfo, InputStream> isFactory) {
         this.info = info;
         this.inputStreamFactory = isFactory;
     }
 
     @Override
-    public String name() {
-        return info.name();
+    public String getName() {
+        return info.getName();
     }
 
     @Override
-    public long size() {
-        return info.size();
+    public long getSize() {
+        return info.getSize();
     }
 
     @Override
@@ -45,6 +45,6 @@ public class BundleInternalEntry extends BundleEntry {
 
     @Override
     public String toString() {
-        return name();
+        return getName();
     }
 }
